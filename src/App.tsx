@@ -5,6 +5,7 @@ import { QueryParamProvider } from 'use-query-params';
 import ExamplesPage from './pages/ExamplesPage';
 import CompositionalPatterns from './pages/CompositionalPatterns';
 import JavascriptPatterns from './pages/JavascriptPatterns';
+import TodosPage from './pages/TodosPage';
 
 const App: React.FC = () => {
   return (
@@ -16,6 +17,9 @@ const App: React.FC = () => {
           </Route>
           <Route path="/js-patterns">
             <JavascriptPatterns />
+          </Route>
+          <Route path="/todos">
+            <TodosPage />
           </Route>
           <Route path="/:segment">
             <ExamplesPage />
