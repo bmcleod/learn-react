@@ -3315,6 +3315,45 @@
     mkdirp "^1.0.4"
     rimraf "^3.0.2"
 
+"@plasmicapp/host@1.0.25":
+  version "1.0.25"
+  resolved "https://registry.yarnpkg.com/@plasmicapp/host/-/host-1.0.25.tgz#3403917cf3d8560a35e1f014304f20a4f37929b6"
+  integrity sha512-0APmhPCGCtd23UwA0ISau1tYaqhlQE8dnuAN/RKGl8LP2VCP2b2YCMMk0MJl6cbiEAR0GagSYFvNnasmJ00H1A==
+  dependencies:
+    "@plasmicapp/preamble" "0.0.57"
+    window-or-global "^1.0.1"
+
+"@plasmicapp/loader-core@1.0.63":
+  version "1.0.63"
+  resolved "https://registry.yarnpkg.com/@plasmicapp/loader-core/-/loader-core-1.0.63.tgz#a6541351ebc428a7f4ed0257b8cdc658ca724c1a"
+  integrity sha512-E9aBNq0T9P+Qlznr77i5Yj5GzSXxMCXu3PJZ64rmKobAAPYHV+GrC87qVFef95ZILHW+QpLOjEyYJl1AizvITw==
+  dependencies:
+    isomorphic-unfetch "^3.1.0"
+
+"@plasmicapp/loader-react@^1.0.80":
+  version "1.0.80"
+  resolved "https://registry.yarnpkg.com/@plasmicapp/loader-react/-/loader-react-1.0.80.tgz#ffea691dcc8f4d07020c25a6b71ed046504aad61"
+  integrity sha512-+/3H82ZYfTXlO3Jnx2iYYS88430MGSsONSDFuc+0QtcV1bqEaI+bxxEgq/DxXk97BFOn6+dvIjz3t2dEwuxZSw==
+  dependencies:
+    "@plasmicapp/host" "1.0.25"
+    "@plasmicapp/loader-core" "1.0.63"
+    "@plasmicapp/query" "0.1.32"
+    pascalcase "^1.0.0"
+    react-is "^17.0.2"
+    react-ssr-prepass "^1.4.0"
+
+"@plasmicapp/preamble@0.0.57":
+  version "0.0.57"
+  resolved "https://registry.yarnpkg.com/@plasmicapp/preamble/-/preamble-0.0.57.tgz#b17d97a4bdda9069d2351316330d32cc5bcdf782"
+  integrity sha512-y65gqIiv2htkdJo4VxtNCwFw07Yi7kGHf2sPYmDFvK/6nQrY1+quDp2XRdsuUUEs1c6s0Ubdi42mwAb/54H0Fg==
+
+"@plasmicapp/query@0.1.32":
+  version "0.1.32"
+  resolved "https://registry.yarnpkg.com/@plasmicapp/query/-/query-0.1.32.tgz#a63bbc145e6cd99eb9a17001709434fa2ac8e701"
+  integrity sha512-A+65nzejKanUeqThqOB+dtYgLZN4WgpKb6lz1o0ZOD/pgEX9aWpLabEIGaEj2rLoY9zBAXzcMwBenE95b2u7Ig==
+  dependencies:
+    react-ssr-prepass "^1.4.0"
+
 "@pmmmwh/react-refresh-webpack-plugin@0.4.3", "@pmmmwh/react-refresh-webpack-plugin@^0.4.3":
   version "0.4.3"
   resolved "https://registry.npmjs.org/@pmmmwh/react-refresh-webpack-plugin/-/react-refresh-webpack-plugin-0.4.3.tgz"
@@ -10402,6 +10441,14 @@ isobject@^4.0.0:
   resolved "https://registry.yarnpkg.com/isobject/-/isobject-4.0.0.tgz#3f1c9155e73b192022a80819bacd0343711697b0"
   integrity sha512-S/2fF5wH8SJA/kmwr6HYhK/RI/OkhD84k8ntalo0iJjZikgq1XFvR5M8NPT1x5F7fBwCG3qHfnzeP/Vh/ZxCUA==
 
+isomorphic-unfetch@^3.1.0:
+  version "3.1.0"
+  resolved "https://registry.yarnpkg.com/isomorphic-unfetch/-/isomorphic-unfetch-3.1.0.tgz#87341d5f4f7b63843d468438128cb087b7c3e98f"
+  integrity sha512-geDJjpoZ8N0kWexiwkX8F9NkTsXhetLPVbZFQ+JTW239QNOwvB0gniuR1Wc6f0AMTn7/mFGyXvHTifrCp/GH8Q==
+  dependencies:
+    node-fetch "^2.6.1"
+    unfetch "^4.2.0"
+
 isstream@~0.1.2:
   version "0.1.2"
   resolved "https://registry.npmjs.org/isstream/-/isstream-0.1.2.tgz"
@@ -12465,6 +12512,11 @@ pascalcase@^0.1.1:
   resolved "https://registry.npmjs.org/pascalcase/-/pascalcase-0.1.1.tgz"
   integrity sha1-s2PlXoAGym/iF4TS2yK9FdeRfxQ=
 
+pascalcase@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/pascalcase/-/pascalcase-1.0.0.tgz#d2fd7d73f2969606d2b56e17f5261be41c43c381"
+  integrity sha512-BSExi0rRnCHReJys6NocaK+cfTXNinAegfWBvr0JD3hiaEG7Nuc7r0CIdOJunXrs8gU/sbHQ9dxVAtiVQisjmg==
+
 path-browserify@0.0.1:
   version "0.0.1"
   resolved "https://registry.npmjs.org/path-browserify/-/path-browserify-0.0.1.tgz"
@@ -14031,6 +14083,11 @@ react-sizeme@^3.0.1:
     invariant "^2.2.4"
     shallowequal "^1.1.0"
     throttle-debounce "^3.0.1"
+
+react-ssr-prepass@^1.4.0:
+  version "1.5.0"
+  resolved "https://registry.yarnpkg.com/react-ssr-prepass/-/react-ssr-prepass-1.5.0.tgz#bc4ca7fcb52365e6aea11cc254a3d1bdcbd030c5"
+  integrity sha512-yFNHrlVEReVYKsLI5lF05tZoHveA5pGzjFbFJY/3pOqqjGOmMmqx83N4hIjN2n6E1AOa+eQEUxs3CgRnPmT0RQ==
 
 react-style-singleton@^2.1.0:
   version "2.1.1"
@@ -16844,6 +16901,11 @@ widest-line@^3.1.0:
   integrity sha512-NsmoXalsWVDMGupxZ5R08ka9flZjjiLvHVAWYOKtiKM8ujtZWr9cRffak+uSE48+Ob8ObalXpwyeUiyDD6QFgg==
   dependencies:
     string-width "^4.0.0"
+
+window-or-global@^1.0.1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/window-or-global/-/window-or-global-1.0.1.tgz#dbe45ba2a291aabc56d62cf66c45b7fa322946de"
+  integrity sha1-2+RboqKRqrxW1iz2bEW3+jIpRt4=
 
 word-wrap@^1.2.3, word-wrap@~1.2.3:
   version "1.2.3"
