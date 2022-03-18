@@ -7,13 +7,14 @@ import { PLASMIC } from './plasmic-init';
 import ExamplesPage from './pages/ExamplesPage';
 import CompositionalPatterns from './pages/CompositionalPatterns';
 import JavascriptPatterns from './pages/JavascriptPatterns';
+import TodosPage from './pages/TodosPage';
 import CatchAllPage from './pages/CatchAllPage';
 import HomePage from './pages/HomePage';
 
 const App: React.FC = () => {
   return (
     <PlasmicRootProvider loader={PLASMIC}>
-      <BrowserRouter>
+      <BrowserRouter>``
         <QueryParamProvider ReactRouterRoute={Route}>
           <Switch>
             <Route path="/compositional-patterns">
@@ -21,6 +22,9 @@ const App: React.FC = () => {
             </Route>
             <Route path="/js-patterns">
               <JavascriptPatterns />
+            </Route>
+            <Route path="/todos">
+              <TodosPage />
             </Route>
             <Route path="/examples:segment">
               <ExamplesPage />
