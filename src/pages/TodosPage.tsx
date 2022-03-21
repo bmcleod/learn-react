@@ -53,13 +53,10 @@ const TodosList: React.FC = () => {
 
 const TodosPage: React.FC = () => {
   return (
-    <Xano.Provider specURL="x8ki-letl-twmt.n7.xano.io/apispec:KH9oIQzX">
-      <UI.Box p={8} bg="white">
-        <UI.Heading mb={4}>Todos</UI.Heading>
-
-        <TodosList />
-      </UI.Box>
-    </Xano.Provider>
+    <UI.Box p={8} bg="white">
+      <UI.Heading mb={4}>Todos</UI.Heading>
+      <TodosList />
+    </UI.Box>
   );
 };
 

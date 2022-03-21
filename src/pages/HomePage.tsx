@@ -1,55 +1,42 @@
 import React from 'react';
+import * as UI from '@chakra-ui/react';
 import { PlasmicComponent } from '@plasmicapp/loader-react';
-import _ from 'lodash';
+import { formatDistance } from 'date-fns';
 
-const HomePage: React.FC = () => {
-  const products = _.times(12, (n) => {
-    return {
-      title: `Nic Cage ${n + 1}`,
-      price: _.random(10, 200),
-      image: 'https://www.placecage.com/c/160/160',
-    };
-  });
-  const productCards = _.map(products, (product) => {
-    return (
-      <PlasmicComponent
-        component="ProductCard"
-        componentProps={{
-          title: product.title,
-          price: `$${product.price}.00`,
-          image: <img alt={product.title} src={product.image} />,
-        }}
-      />
-    );
-  });
+import { Todo } from '../types';
+import Xano from '../providers/XanoProvider';
+
+const PlasmicCagePage: React.FC = () => {
+  const { loading, error, data: todos } = Xano.useXano<Todo[]>('getTodo');
+
+  if (loading) return <UI.Spinner />;
+  if (error) return <UI.Alert>Uh oh.</UI.Alert>;
 
   return (
     <PlasmicComponent
       component="Home"
       componentProps={{
-        header: {
-          props: {
-            img: {
-              src: 'https://www.placecage.com/c/200/39',
-            },
-            link: {
-              href: 'https://niccage.com/',
-            },
-          },
-        },
-        productCarousel: {
-          props: {
-            collectionName: {
-              children: 'Nic Cage Furniture Collection',
-            },
-            img: {
-              src: 'https://www.placecage.com/c/328/600',
-            },
-          },
-        },
         productGrid: {
           props: {
-            children: productCards,
+            children: todos.map((todo) => (
+              <PlasmicComponent
+                key={todo.id}
+                component="ProductCard"
+                componentProps={{
+                  title: todo.task,
+                  price: formatDistance(new Date(todo.created_at), new Date(), {
+                    addSuffix: true,
+                  }),
+                  ratings: null,
+                  image: (
+                    <img
+                      alt={todo.task}
+                      src="https://www.placecage.com/c/160/160"
+                    />
+                  ),
+                }}
+              />
+            )),
           },
         },
       }}
@@ -57,4 +44,4 @@ const HomePage: React.FC = () => {
   );
 };
 
-export default HomePage;
+export default PlasmicCagePage;
