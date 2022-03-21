@@ -11,7 +11,9 @@ import JavascriptPatterns from './pages/JavascriptPatterns';
 import TodosPage from './pages/TodosPage';
 import CatchAllPage from './pages/CatchAllPage';
 import PlasmicCagePage from './pages/PlasmicCagePage';
-import HomePage from './pages/HomePage';
+import PlasmicXanoPage from './pages/PlasmicXanoPage';
+
+import Home from './components/Home'; // Plasmic generated
 
 const App: React.FC = () => {
   return (
@@ -38,8 +40,11 @@ const App: React.FC = () => {
               <Route path="/plasmic-cage">
                 <PlasmicCagePage />
               </Route>
+              <Route path="/plasmic-xano">
+                <PlasmicXanoPage />
+              </Route>
               <Route path="/">
-                <HomePage />
+                <Home />
               </Route>
               <Route component={CatchAllPage} />
             </Switch>

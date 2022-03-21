@@ -1,0 +1,220 @@
+.root {
+  flex-direction: row;
+  display: flex;
+  position: relative;
+  width: 200px;
+}
+.root > :global(.__wab_flex-container) {
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  margin-left: calc(0px - 8px);
+  width: calc(100% + 8px);
+}
+.root > :global(.__wab_flex-container) > *,
+.root > :global(.__wab_flex-container) > :global(.__wab_slot) > *,
+.root > :global(.__wab_flex-container) > picture > img,
+.root > :global(.__wab_flex-container) > :global(.__wab_slot) > picture > img {
+  margin-left: 8px;
+}
+.freeBox {
+  flex-direction: row;
+  display: flex;
+  position: relative;
+}
+.freeBox > :global(.__wab_flex-container) {
+  flex-direction: row;
+  justify-content: flex-start;
+  align-items: stretch;
+  margin-left: calc(0px - 5px);
+  width: calc(100% + 5px);
+}
+.freeBox > :global(.__wab_flex-container) > *,
+.freeBox > :global(.__wab_flex-container) > :global(.__wab_slot) > *,
+.freeBox > :global(.__wab_flex-container) > picture > img,
+.freeBox
+  > :global(.__wab_flex-container)
+  > :global(.__wab_slot)
+  > picture
+  > img {
+  margin-left: 5px;
+}
+.svg__gCnNq {
+  position: relative;
+  object-fit: cover;
+  width: 14px;
+  height: 14px;
+  color: var(--token-vXbwRnh_OXvRS);
+  flex-shrink: 0;
+}
+.svgstars_zero__gCnNQf65F1 {
+  display: none;
+}
+.svg___0DqD1 {
+  position: relative;
+  object-fit: cover;
+  width: 14px;
+  height: 14px;
+  color: var(--token-vXbwRnh_OXvRS);
+  flex-shrink: 0;
+  display: none;
+}
+.svgstars_zero___0DqD1F65F1 {
+  display: none;
+}
+.svgstars_one___0DqD1BtaaK {
+  display: none;
+}
+.svg__ip9Ei {
+  position: relative;
+  object-fit: cover;
+  width: 14px;
+  height: 14px;
+  color: var(--token-vXbwRnh_OXvRS);
+  flex-shrink: 0;
+  display: none;
+}
+.svgstars_zero__ip9Eif65F1 {
+  display: none;
+}
+.svgstars_one__ip9EibtaaK {
+  display: none;
+}
+.svgstars_two__ip9EiTcklh {
+  display: none;
+}
+.svg__twUxF {
+  position: relative;
+  object-fit: cover;
+  width: 14px;
+  height: 14px;
+  color: var(--token-vXbwRnh_OXvRS);
+  flex-shrink: 0;
+  display: none;
+}
+.svgstars_zero__twUxFf65F1 {
+  display: none;
+}
+.svgstars_one__twUxFbtaaK {
+  display: none;
+}
+.svgstars_two__twUxFTcklh {
+  display: none;
+}
+.svgstars_three__twUxFGSxm {
+  display: none;
+}
+.svg__zxikp {
+  position: relative;
+  object-fit: cover;
+  width: 14px;
+  height: 14px;
+  color: var(--token-vXbwRnh_OXvRS);
+  flex-shrink: 0;
+  display: none;
+}
+.svgstars_zero__zxikpf65F1 {
+  display: none;
+}
+.svgstars_one__zxikpbtaaK {
+  display: none;
+}
+.svgstars_two__zxikpTcklh {
+  display: none;
+}
+.svgstars_three__zxikpGSxm {
+  display: none;
+}
+.svgstars_four__zxikpk9QdU {
+  display: none;
+}
+.svg__ywX3J {
+  position: relative;
+  object-fit: cover;
+  width: 14px;
+  height: 14px;
+  color: var(--token-_Mx0V_Dy2thZS);
+  flex-shrink: 0;
+  display: none;
+}
+.svgstars_one__ywX3JbtaaK {
+  display: none;
+}
+.svgstars_two__ywX3JTcklh {
+  display: none;
+}
+.svgstars_three__ywX3JGSxm {
+  display: none;
+}
+.svgstars_four__ywX3Jk9QdU {
+  display: none;
+}
+.svgstars_five__ywX3JtZtLw {
+  display: none;
+}
+.svg__oair7 {
+  position: relative;
+  object-fit: cover;
+  width: 14px;
+  height: 14px;
+  color: var(--token-_Mx0V_Dy2thZS);
+  flex-shrink: 0;
+}
+.svgstars_two__oair7Tcklh {
+  display: none;
+}
+.svgstars_three__oair7GSxm {
+  display: none;
+}
+.svgstars_four__oair7K9QdU {
+  display: none;
+}
+.svgstars_five__oair7TZtLw {
+  display: none;
+}
+.svg___99Tsp {
+  position: relative;
+  object-fit: cover;
+  width: 14px;
+  height: 14px;
+  color: var(--token-_Mx0V_Dy2thZS);
+  flex-shrink: 0;
+}
+.svgstars_three___99TspGSxm {
+  display: none;
+}
+.svgstars_four___99TsPk9QdU {
+  display: none;
+}
+.svgstars_five___99TsPtZtLw {
+  display: none;
+}
+.svg__nqke2 {
+  position: relative;
+  object-fit: cover;
+  width: 14px;
+  height: 14px;
+  color: var(--token-_Mx0V_Dy2thZS);
+  flex-shrink: 0;
+}
+.svgstars_four__nqke2K9QdU {
+  display: none;
+}
+.svgstars_five__nqke2TZtLw {
+  display: none;
+}
+.svg__o6Ls2 {
+  position: relative;
+  object-fit: cover;
+  width: 14px;
+  height: 14px;
+  color: var(--token-_Mx0V_Dy2thZS);
+  flex-shrink: 0;
+}
+.svgstars_five__o6Ls2TZtLw {
+  display: none;
+}
+.slotTargetNumReviews {
+  font-size: 14px;
+  color: var(--token-4-2XUfGC4KbX-);
+}

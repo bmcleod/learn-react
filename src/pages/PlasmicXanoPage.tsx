@@ -6,7 +6,7 @@ import { formatDistance } from 'date-fns';
 import { Todo } from '../types';
 import Xano from '../providers/XanoProvider';
 
-const PlasmicCagePage: React.FC = () => {
+const PlasmicXanoPage: React.FC = () => {
   const { loading, error, data: todos } = Xano.useXano<Todo[]>('getTodo');
 
   if (loading) return <UI.Spinner />;
@@ -44,4 +44,4 @@ const PlasmicCagePage: React.FC = () => {
   );
 };
 
-export default PlasmicCagePage;
+export default PlasmicXanoPage;

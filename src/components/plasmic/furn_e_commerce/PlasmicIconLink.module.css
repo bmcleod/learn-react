@@ -1,0 +1,31 @@
+.root {
+  display: flex;
+  width: 32px;
+  height: 32px;
+  position: relative;
+  align-items: center;
+  justify-content: center;
+}
+.freeBox {
+  display: flex;
+  position: relative;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  border-radius: 16px;
+}
+.slotTargetIcon {
+  color: var(--token-dph1wZ7NjV9);
+}
+.svg__eVof {
+  position: relative;
+  object-fit: cover;
+  color: var(--token-4bfB2KHdt2Daz);
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
