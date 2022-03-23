@@ -25,6 +25,12 @@ export const CatchAllPage: React.FC = () => {
     load();
   }, []);
 
+  const title = pageData?.entryCompMetas[0].pageMetadata?.title;
+  if (title) {
+    window.document.title = title;
+  }
+  // TODO: other meta tags
+
   if (loading) {
     return <div>Loading...</div>;
   }

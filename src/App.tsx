@@ -28,7 +28,7 @@ const App: React.FC = () => {
             <Route path="/examples">
               <ExamplesPage />
             </Route>
-            <Route path="/">
+            <Route path="/" exact>
               <HomePage />
             </Route>
             <Route component={CatchAllPage} />
