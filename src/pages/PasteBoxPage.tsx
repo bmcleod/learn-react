@@ -1,14 +1,12 @@
 import React from 'react';
-// import _ from 'lodash';
+import _ from 'lodash';
 import * as UI from '@chakra-ui/react';
 import useLocalStorageState from 'use-local-storage-state';
-// import * as ReactHookForm from 'react-hook-form';
 import SanitizedHTML from 'react-sanitized-html';
 import sanitizeHTML from 'sanitize-html';
 import StackGrid from 'react-stack-grid';
 
-// console.log(sanitizeHTML.defaults.allowedTags);
-// console.log(sanitizeHTML.defaults.allowedAttributes);
+import createShortCode from '../helpers/createShortCode';
 
 interface PastedTextData {
   type: 'text';
@@ -31,6 +29,7 @@ interface PastedURLData {
 type PastedData = PastedTextData | PastedImageData | PastedURLData;
 
 interface PastedItem {
+  id: string;
   data: PastedData;
 }
 
@@ -44,7 +43,11 @@ const usePastedItems = () => {
     setPastedItems([...pastedItems, { ...item }]);
   };
 
-  return { pastedItems, addPastedItem };
+  const removePastedItem = (item: PastedItem) => {
+    setPastedItems(pastedItems.filter((i) => i !== item));
+  };
+
+  return { pastedItems, addPastedItem, removePastedItem };
 };
 
 const usePastedData = (handlePastedData: (item: PastedData) => any) => {
@@ -122,27 +125,73 @@ const useInnerBackgroundColor = (className: string) => {
       }
       setBackgroundColor(element.style.backgroundColor);
     }
-  }, [className, ref.current, setBackgroundColor]);
+  }, [className, ref, setBackgroundColor]);
 
   return { ref, backgroundColor };
 };
 
-const PasteBoxElement: React.FC<{ item: PastedItem }> = ({ item }) => {
+interface PastingContextShape {
+  items: PastedItem[];
+  add: (item: PastedItem) => void;
+  remove: (item: PastedItem) => void;
+}
+
+const PastingContext = React.createContext<PastingContextShape>(
+  {} as PastingContextShape
+);
+
+const usePastingContext = () => React.useContext(PastingContext);
+
+const PastingContextProvider: React.FC = ({ children }) => {
+  const { pastedItems, addPastedItem, removePastedItem } = usePastedItems();
+
+  const handlePastedData = React.useCallback(
+    (pastedData: PastedData) => {
+      addPastedItem({ id: createShortCode(), data: pastedData });
+    },
+    [addPastedItem]
+  );
+
+  usePastedData(handlePastedData);
+
+  const value = {
+    items: pastedItems,
+    add: addPastedItem,
+    remove: removePastedItem,
+  };
+
+  return (
+    <PastingContext.Provider value={value}>{children}</PastingContext.Provider>
+  );
+};
+
+const PasteBoxElement: React.FC<{
+  item: PastedItem;
+  onRemoveClick: () => any;
+}> = ({ item, onRemoveClick }) => {
   const santizedHtmlClassName = 'sanitized-html';
   const { ref, backgroundColor } = useInnerBackgroundColor(
     santizedHtmlClassName
   );
 
   return (
-    <UI.Box>
+    <UI.Box position="relative">
+      <UI.Button
+        position="absolute"
+        top={2}
+        right={2}
+        onClick={onRemoveClick}
+        size="xs"
+        colorScheme="red"
+      >
+        Delete
+      </UI.Button>
       {item.data.type === 'text' ? (
         <React.Fragment>
           {item.data.text.html ? (
             <UI.Box
               ref={ref}
               bg={backgroundColor}
-              // border="1px solid"
-              // borderColor="black"
               borderRadius="lg"
               overflow="hidden"
               p={4}
@@ -157,14 +206,7 @@ const PasteBoxElement: React.FC<{ item: PastedItem }> = ({ item }) => {
               />
             </UI.Box>
           ) : (
-            <UI.Box
-              bg="white"
-              // border="1px solid"
-              // borderColor="black"
-              borderRadius="lg"
-              overflow="hidden"
-              p={4}
-            >
+            <UI.Box bg="white" borderRadius="lg" overflow="hidden" p={4}>
               {item.data.text.plain.split('\n').map((line, index) => (
                 <p key={index}>{line}</p>
               ))}
@@ -183,41 +225,44 @@ const PasteBoxElement: React.FC<{ item: PastedItem }> = ({ item }) => {
   );
 };
 
-const PasteBoxPage: React.FC = () => {
-  const { pastedItems, addPastedItem } = usePastedItems();
-
-  const handlePastedData = React.useCallback(
-    (pastedData: PastedData) => {
-      addPastedItem({ data: pastedData });
-    },
-    [addPastedItem]
-  );
-
-  usePastedData(handlePastedData);
+const PastedItemGrid: React.FC = () => {
+  const pastingContext = usePastingContext();
 
   return (
-    <UI.Box p="4" bg="gray.300">
-      <UI.Heading size="3xl" mb={8}>
-        PasteBox Page
-      </UI.Heading>
-      {pastedItems.length > 0 ? (
+    <React.Fragment>
+      {_.isEmpty(pastingContext.items) ? (
+        <UI.Box>No pasted items</UI.Box>
+      ) : (
         <StackGrid
           columnWidth={360}
           gutterWidth={8}
           gutterHeight={8}
           duration={300}
+          monitorImagesLoaded
         >
-          {pastedItems
+          {pastingContext.items
             .slice()
             .reverse()
-            .map((item, index) => (
-              <PasteBoxElement key={index} item={item} />
+            .map((item) => (
+              <PasteBoxElement
+                key={item.id}
+                item={item}
+                onRemoveClick={() => pastingContext.remove(item)}
+              />
             ))}
         </StackGrid>
-      ) : (
-        <UI.Box>No pasted items</UI.Box>
       )}
-    </UI.Box>
+    </React.Fragment>
+  );
+};
+
+const PasteBoxPage: React.FC = () => {
+  return (
+    <PastingContextProvider>
+      <UI.Box p={4}>
+        <PastedItemGrid />
+      </UI.Box>
+    </PastingContextProvider>
   );
 };
 
