@@ -165,6 +165,21 @@ const PastingContextProvider: React.FC = ({ children }) => {
   );
 };
 
+const PastedItemWrapper = React.forwardRef<HTMLDivElement, UI.BoxProps>(
+  (props, ref) => {
+    return (
+      <UI.Box
+        ref={ref}
+        bg="white"
+        borderRadius="lg"
+        overflow="hidden"
+        p={4}
+        {...props}
+      />
+    );
+  }
+);
+
 const PasteBoxElement: React.FC<{
   item: PastedItem;
   onRemoveClick: () => any;
@@ -189,13 +204,7 @@ const PasteBoxElement: React.FC<{
       {item.data.type === 'text' ? (
         <React.Fragment>
           {item.data.text.html ? (
-            <UI.Box
-              ref={ref}
-              bg={backgroundColor}
-              borderRadius="lg"
-              overflow="hidden"
-              p={4}
-            >
+            <PastedItemWrapper ref={ref} bg={backgroundColor}>
               <SanitizedHTML
                 className={santizedHtmlClassName}
                 allowedAttributes={{
@@ -204,22 +213,20 @@ const PasteBoxElement: React.FC<{
                 }}
                 html={item.data.text.html}
               />
-            </UI.Box>
+            </PastedItemWrapper>
           ) : (
-            <UI.Box bg="white" borderRadius="lg" overflow="hidden" p={4}>
+            <PastedItemWrapper>
               {item.data.text.plain.split('\n').map((line, index) => (
                 <p key={index}>{line}</p>
               ))}
-            </UI.Box>
+            </PastedItemWrapper>
           )}
         </React.Fragment>
       ) : null}
       {item.data.type === 'image' ? (
-        <React.Fragment>
-          <UI.Box bg="gray.800" borderRadius="lg" overflow="hidden">
-            <UI.Image src={item.data.text} alt="..." />
-          </UI.Box>
-        </React.Fragment>
+        <PastedItemWrapper p={0}>
+          <UI.Image src={item.data.text} alt="..." />
+        </PastedItemWrapper>
       ) : null}
     </UI.Box>
   );
