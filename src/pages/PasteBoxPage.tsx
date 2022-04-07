@@ -5,6 +5,7 @@ import useLocalStorageState from 'use-local-storage-state';
 // import * as ReactHookForm from 'react-hook-form';
 import SanitizedHTML from 'react-sanitized-html';
 import sanitizeHTML from 'sanitize-html';
+import StackGrid from 'react-stack-grid';
 
 // console.log(sanitizeHTML.defaults.allowedTags);
 // console.log(sanitizeHTML.defaults.allowedAttributes);
@@ -121,7 +122,7 @@ const useInnerBackgroundColor = (className: string) => {
       }
       setBackgroundColor(element.style.backgroundColor);
     }
-  }, [className, ref, setBackgroundColor]);
+  }, [className, ref.current, setBackgroundColor]);
 
   return { ref, backgroundColor };
 };
@@ -145,7 +146,6 @@ const PasteBoxElement: React.FC<{ item: PastedItem }> = ({ item }) => {
               borderRadius="lg"
               overflow="hidden"
               p={4}
-              mb={4}
             >
               <SanitizedHTML
                 className={santizedHtmlClassName}
@@ -164,7 +164,6 @@ const PasteBoxElement: React.FC<{ item: PastedItem }> = ({ item }) => {
               borderRadius="lg"
               overflow="hidden"
               p={4}
-              mb={4}
             >
               {item.data.text.plain.split('\n').map((line, index) => (
                 <p key={index}>{line}</p>
@@ -175,7 +174,7 @@ const PasteBoxElement: React.FC<{ item: PastedItem }> = ({ item }) => {
       ) : null}
       {item.data.type === 'image' ? (
         <React.Fragment>
-          <UI.Box bg="gray.800" mb={4} borderRadius="lg" overflow="hidden">
+          <UI.Box bg="gray.800" borderRadius="lg" overflow="hidden">
             <UI.Image src={item.data.text} alt="..." />
           </UI.Box>
         </React.Fragment>
@@ -202,9 +201,19 @@ const PasteBoxPage: React.FC = () => {
         PasteBox Page
       </UI.Heading>
       {pastedItems.length > 0 ? (
-        pastedItems.map((item, index) => (
-          <PasteBoxElement key={index} item={item} />
-        ))
+        <StackGrid
+          columnWidth={360}
+          gutterWidth={8}
+          gutterHeight={8}
+          duration={300}
+        >
+          {pastedItems
+            .slice()
+            .reverse()
+            .map((item, index) => (
+              <PasteBoxElement key={index} item={item} />
+            ))}
+        </StackGrid>
       ) : (
         <UI.Box>No pasted items</UI.Box>
       )}
