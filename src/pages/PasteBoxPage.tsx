@@ -5,9 +5,12 @@ import useLocalStorageState from 'use-local-storage-state';
 import SanitizedHTML from 'react-sanitized-html';
 import sanitizeHTML from 'sanitize-html';
 import StackGrid from 'react-stack-grid';
+import isURL from 'is-url';
+import ReactPlayer from 'react-player';
 
 import createShortCode from '../helpers/createShortCode';
 
+const COLUMN_WIDTH = 480;
 interface PastedTextData {
   type: 'text';
   text: {
@@ -18,15 +21,31 @@ interface PastedTextData {
 
 interface PastedImageData {
   type: 'image';
-  text: string;
+  src: string;
 }
 
 interface PastedURLData {
   type: 'url';
-  text: string;
+  url: string;
+  meta: Partial<{
+    author: string;
+    description: string;
+    image: string;
+    logo: string;
+    title: string;
+  }>;
 }
 
-type PastedData = PastedTextData | PastedImageData | PastedURLData;
+interface PastedPlayerData {
+  type: 'player';
+  url: string;
+}
+
+type PastedData =
+  | PastedTextData
+  | PastedImageData
+  | PastedURLData
+  | PastedPlayerData;
 
 interface PastedItem {
   id: string;
@@ -53,9 +72,26 @@ const usePastedItems = () => {
 const usePastedData = (handlePastedData: (item: PastedData) => any) => {
   React.useEffect(() => {
     const handlePaste = async () => {
-      // TODO: detect URL, get metadata, etc.
-      // const text = await window.navigator.clipboard.readText();
-      // console.log('Pasted text: ', text);
+      // Detect URL
+      const text = await window.navigator.clipboard.readText();
+      if (text) {
+        if (isURL(text)) {
+          if (ReactPlayer.canPlay(text)) {
+            handlePastedData({
+              type: 'player',
+              url: text,
+            });
+            return;
+          } else {
+            handlePastedData({
+              type: 'url',
+              url: text,
+              meta: {},
+            });
+            return;
+          }
+        }
+      }
 
       try {
         const data = await window.navigator.clipboard.read();
@@ -81,7 +117,7 @@ const usePastedData = (handlePastedData: (item: PastedData) => any) => {
             fileReader.addEventListener(
               'load',
               () => {
-                result.text = fileReader.result?.toString() || '';
+                result.src = fileReader.result?.toString() || '';
                 handlePastedData(result);
               },
               false
@@ -180,15 +216,76 @@ const PastedItemWrapper = React.forwardRef<HTMLDivElement, UI.BoxProps>(
   }
 );
 
-const PasteBoxElement: React.FC<{
-  item: PastedItem;
-  onRemoveClick: () => any;
-}> = ({ item, onRemoveClick }) => {
+const HTMLTextItem: React.FC<{ item: PastedItem }> = ({ item }) => {
   const santizedHtmlClassName = 'sanitized-html';
   const { ref, backgroundColor } = useInnerBackgroundColor(
     santizedHtmlClassName
   );
 
+  if (item.data.type !== 'text') return null;
+
+  return (
+    <PastedItemWrapper ref={ref} bg={backgroundColor}>
+      <SanitizedHTML
+        className={santizedHtmlClassName}
+        allowedAttributes={{
+          ...sanitizeHTML.defaults.allowedAttributes,
+          '*': ['style'],
+        }}
+        html={item.data.text.html}
+      />
+    </PastedItemWrapper>
+  );
+};
+const PlainTextItem: React.FC<{ item: PastedItem }> = ({ item }) => {
+  if (item.data.type !== 'text') return null;
+
+  return (
+    <PastedItemWrapper>
+      {item.data.text.plain.split('\n').map((line, index) => (
+        <p key={index}>{line}</p>
+      ))}
+    </PastedItemWrapper>
+  );
+};
+const ImageItem: React.FC<{ item: PastedItem }> = ({ item }) => {
+  if (item.data.type !== 'image') return null;
+
+  return (
+    <PastedItemWrapper p={0}>
+      <UI.Image src={item.data.src} alt="..." w="100%" />
+    </PastedItemWrapper>
+  );
+};
+const URLItem: React.FC<{ item: PastedItem }> = ({ item }) => {
+  if (item.data.type !== 'url') return null;
+
+  return (
+    <PastedItemWrapper>
+      <UI.Link href={item.data.url} target="_blank">
+        {item.data.url.split('://')[1]}
+      </UI.Link>
+    </PastedItemWrapper>
+  );
+};
+const PlayerItem: React.FC<{ item: PastedItem }> = ({ item }) => {
+  if (item.data.type !== 'player') return null;
+
+  const playerAspectRatio = 16 / 9;
+  const width = COLUMN_WIDTH;
+  const height = Math.floor(width / playerAspectRatio);
+
+  return (
+    <PastedItemWrapper p={0}>
+      <ReactPlayer url={item.data.url} width={width} height={height} />
+    </PastedItemWrapper>
+  );
+};
+
+const PasteBoxElement: React.FC<{
+  item: PastedItem;
+  onRemoveClick: () => any;
+}> = ({ item, onRemoveClick }) => {
   return (
     <UI.Box position="relative">
       <UI.Button
@@ -201,33 +298,19 @@ const PasteBoxElement: React.FC<{
       >
         Delete
       </UI.Button>
+
       {item.data.type === 'text' ? (
         <React.Fragment>
           {item.data.text.html ? (
-            <PastedItemWrapper ref={ref} bg={backgroundColor}>
-              <SanitizedHTML
-                className={santizedHtmlClassName}
-                allowedAttributes={{
-                  ...sanitizeHTML.defaults.allowedAttributes,
-                  '*': ['style'],
-                }}
-                html={item.data.text.html}
-              />
-            </PastedItemWrapper>
+            <HTMLTextItem item={item} />
           ) : (
-            <PastedItemWrapper>
-              {item.data.text.plain.split('\n').map((line, index) => (
-                <p key={index}>{line}</p>
-              ))}
-            </PastedItemWrapper>
+            <PlainTextItem item={item} />
           )}
         </React.Fragment>
       ) : null}
-      {item.data.type === 'image' ? (
-        <PastedItemWrapper p={0}>
-          <UI.Image src={item.data.text} alt="..." />
-        </PastedItemWrapper>
-      ) : null}
+      {item.data.type === 'image' ? <ImageItem item={item} /> : null}
+      {item.data.type === 'url' ? <URLItem item={item} /> : null}
+      {item.data.type === 'player' ? <PlayerItem item={item} /> : null}
     </UI.Box>
   );
 };
@@ -241,9 +324,9 @@ const PastedItemGrid: React.FC = () => {
         <UI.Box>No pasted items</UI.Box>
       ) : (
         <StackGrid
-          columnWidth={360}
-          gutterWidth={8}
-          gutterHeight={8}
+          columnWidth={COLUMN_WIDTH}
+          gutterWidth={12}
+          gutterHeight={12}
           duration={300}
           monitorImagesLoaded
         >

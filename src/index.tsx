@@ -13,6 +13,17 @@ const theme = extendTheme({
       },
     },
   },
+  components: {
+    Link: {
+      baseStyle: {
+        color: 'blue.500',
+        textDecoration: 'underline',
+        ':hover': {
+          textDecoration: 'none',
+        },
+      },
+    },
+  },
 });
 
 ReactDOM.render(
