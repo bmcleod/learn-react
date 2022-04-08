@@ -11,6 +11,7 @@ import ReactPlayer from 'react-player';
 import createShortCode from '../helpers/createShortCode';
 
 const COLUMN_WIDTH = 480;
+
 interface PastedTextData {
   type: 'text';
   text: {
@@ -52,24 +53,24 @@ interface PastedItem {
   data: PastedData;
 }
 
-const usePastedItems = () => {
-  const [pastedItems, setPastedItems] = useLocalStorageState<PastedItem[]>(
+const usePastedItems = (): PlopperShape => {
+  const [items, setItems] = useLocalStorageState<PastedItem[]>(
     'pastedItems',
     []
   );
 
-  const addPastedItem = (item: PastedItem) => {
-    setPastedItems([...pastedItems, { ...item }]);
+  const add = (item: PastedItem) => {
+    setItems([...items, { ...item }]);
   };
 
-  const removePastedItem = (item: PastedItem) => {
-    setPastedItems(pastedItems.filter((i) => i !== item));
+  const remove = (item: PastedItem) => {
+    setItems(items.filter((i) => i !== item));
   };
 
-  return { pastedItems, addPastedItem, removePastedItem };
+  return { items, add, remove };
 };
 
-const usePastedData = (handlePastedData: (item: PastedData) => any) => {
+const usePasteCallback = (onPaste: (data: PastedData) => any) => {
   React.useEffect(() => {
     const handlePaste = async () => {
       // Detect URL
@@ -77,13 +78,13 @@ const usePastedData = (handlePastedData: (item: PastedData) => any) => {
       if (text) {
         if (isURL(text)) {
           if (ReactPlayer.canPlay(text)) {
-            handlePastedData({
+            onPaste({
               type: 'player',
               url: text,
             });
             return;
           } else {
-            handlePastedData({
+            onPaste({
               type: 'url',
               url: text,
               meta: {},
@@ -118,7 +119,7 @@ const usePastedData = (handlePastedData: (item: PastedData) => any) => {
               'load',
               () => {
                 result.src = fileReader.result?.toString() || '';
-                handlePastedData(result);
+                onPaste(result);
               },
               false
             );
@@ -126,7 +127,7 @@ const usePastedData = (handlePastedData: (item: PastedData) => any) => {
           }
         }
         if (run) {
-          handlePastedData(result);
+          onPaste(result);
         }
       } catch (e) {
         console.error(
@@ -145,59 +146,56 @@ const usePastedData = (handlePastedData: (item: PastedData) => any) => {
     return () => {
       window.document.body.removeEventListener('paste', handlePaste);
     };
-  }, [handlePastedData]);
+  }, [onPaste]);
 };
 
-const useInnerBackgroundColor = (className: string) => {
+const useInnerElementBackgroundColor = (query: string) => {
   const ref = React.useRef<any>(null);
   const [backgroundColor, setBackgroundColor] = React.useState('white');
 
   React.useEffect(() => {
     if (ref.current) {
-      const element = ref.current.getElementsByClassName(className)[0]
-        .firstChild as HTMLElement | undefined;
+      const element = ref.current.querySelector(query) as
+        | HTMLElement
+        | undefined;
       if (!element) {
         return;
       }
       setBackgroundColor(element.style.backgroundColor);
     }
-  }, [className, ref, setBackgroundColor]);
+  }, [query, ref, setBackgroundColor]);
 
   return { ref, backgroundColor };
 };
 
-interface PastingContextShape {
+interface PlopperShape {
   items: PastedItem[];
   add: (item: PastedItem) => void;
   remove: (item: PastedItem) => void;
 }
 
-const PastingContext = React.createContext<PastingContextShape>(
-  {} as PastingContextShape
-);
+const PlopperContext = React.createContext<PlopperShape>({} as PlopperShape);
 
-const usePastingContext = () => React.useContext(PastingContext);
+const usePlopper = () => React.useContext(PlopperContext);
 
-const PastingContextProvider: React.FC = ({ children }) => {
-  const { pastedItems, addPastedItem, removePastedItem } = usePastedItems();
+const PlopperProvider: React.FC = ({ children }) => {
+  const pastedItems = usePastedItems();
 
-  const handlePastedData = React.useCallback(
-    (pastedData: PastedData) => {
-      addPastedItem({ id: createShortCode(), data: pastedData });
+  const { add } = pastedItems;
+
+  const handlePaste = React.useCallback(
+    (data: PastedData) => {
+      add({ id: createShortCode(), data });
     },
-    [addPastedItem]
+    [add]
   );
 
-  usePastedData(handlePastedData);
-
-  const value = {
-    items: pastedItems,
-    add: addPastedItem,
-    remove: removePastedItem,
-  };
+  usePasteCallback(handlePaste);
 
   return (
-    <PastingContext.Provider value={value}>{children}</PastingContext.Provider>
+    <PlopperContext.Provider value={pastedItems}>
+      {children}
+    </PlopperContext.Provider>
   );
 };
 
@@ -217,17 +215,13 @@ const PastedItemWrapper = React.forwardRef<HTMLDivElement, UI.BoxProps>(
 );
 
 const HTMLTextItem: React.FC<{ item: PastedItem }> = ({ item }) => {
-  const santizedHtmlClassName = 'sanitized-html';
-  const { ref, backgroundColor } = useInnerBackgroundColor(
-    santizedHtmlClassName
-  );
+  const { ref, backgroundColor } = useInnerElementBackgroundColor(':scope>*>*');
 
   if (item.data.type !== 'text') return null;
 
   return (
     <PastedItemWrapper ref={ref} bg={backgroundColor}>
       <SanitizedHTML
-        className={santizedHtmlClassName}
         allowedAttributes={{
           ...sanitizeHTML.defaults.allowedAttributes,
           '*': ['style'],
@@ -237,6 +231,7 @@ const HTMLTextItem: React.FC<{ item: PastedItem }> = ({ item }) => {
     </PastedItemWrapper>
   );
 };
+
 const PlainTextItem: React.FC<{ item: PastedItem }> = ({ item }) => {
   if (item.data.type !== 'text') return null;
 
@@ -248,6 +243,7 @@ const PlainTextItem: React.FC<{ item: PastedItem }> = ({ item }) => {
     </PastedItemWrapper>
   );
 };
+
 const ImageItem: React.FC<{ item: PastedItem }> = ({ item }) => {
   if (item.data.type !== 'image') return null;
 
@@ -257,6 +253,7 @@ const ImageItem: React.FC<{ item: PastedItem }> = ({ item }) => {
     </PastedItemWrapper>
   );
 };
+
 const URLItem: React.FC<{ item: PastedItem }> = ({ item }) => {
   if (item.data.type !== 'url') return null;
 
@@ -268,6 +265,7 @@ const URLItem: React.FC<{ item: PastedItem }> = ({ item }) => {
     </PastedItemWrapper>
   );
 };
+
 const PlayerItem: React.FC<{ item: PastedItem }> = ({ item }) => {
   if (item.data.type !== 'player') return null;
 
@@ -282,7 +280,7 @@ const PlayerItem: React.FC<{ item: PastedItem }> = ({ item }) => {
   );
 };
 
-const PasteBoxElement: React.FC<{
+const PastedItemGridItem: React.FC<{
   item: PastedItem;
   onRemoveClick: () => any;
 }> = ({ item, onRemoveClick }) => {
@@ -316,13 +314,11 @@ const PasteBoxElement: React.FC<{
 };
 
 const PastedItemGrid: React.FC = () => {
-  const pastingContext = usePastingContext();
+  const pastingContext = usePlopper();
 
   return (
     <React.Fragment>
-      {_.isEmpty(pastingContext.items) ? (
-        <UI.Box>No pasted items</UI.Box>
-      ) : (
+      {_.isEmpty(pastingContext.items) ? null : (
         <StackGrid
           columnWidth={COLUMN_WIDTH}
           gutterWidth={12}
@@ -334,7 +330,7 @@ const PastedItemGrid: React.FC = () => {
             .slice()
             .reverse()
             .map((item) => (
-              <PasteBoxElement
+              <PastedItemGridItem
                 key={item.id}
                 item={item}
                 onRemoveClick={() => pastingContext.remove(item)}
@@ -342,18 +338,36 @@ const PastedItemGrid: React.FC = () => {
             ))}
         </StackGrid>
       )}
+      <UI.Box textAlign="center" p={4} mt={8}>
+        <UI.Heading size="md" mb={4}>
+          Try pasting something!
+        </UI.Heading>
+        <UI.List
+          textTransform="uppercase"
+          fontWeight="bold"
+          color="gray.500"
+          fontSize="sm"
+        >
+          <UI.ListItem>Plain text or rich text</UI.ListItem>
+          <UI.ListItem>Images or links</UI.ListItem>
+          <UI.ListItem>Videos from YouTube or Twitch</UI.ListItem>
+        </UI.List>
+      </UI.Box>
     </React.Fragment>
   );
 };
 
-const PasteBoxPage: React.FC = () => {
+const PlopperPage: React.FC = () => {
   return (
-    <PastingContextProvider>
+    <PlopperProvider>
+      <UI.Heading textAlign="center" my={4} color="gray.500">
+        plopper.
+      </UI.Heading>
       <UI.Box p={4}>
         <PastedItemGrid />
       </UI.Box>
-    </PastingContextProvider>
+    </PlopperProvider>
   );
 };
 
-export default PasteBoxPage;
+export default PlopperPage;
