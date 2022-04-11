@@ -17,8 +17,8 @@
     "jsx": "react-jsx"
   },
   "files": [
-    "./src/types/react-sanitized-html.d.ts",
-    "./src/types/sanitize-html.d.ts"
+    "./src/typedefs/react-sanitized-html.d.ts",
+    "./src/typedefs/sanitize-html.d.ts"
   ],
   "include": ["src"]
 }
