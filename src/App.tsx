@@ -2,7 +2,6 @@ import React from 'react';
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
 import { QueryParamProvider } from 'use-query-params';
 
-import AuthProvider from './auth/AuthProvider';
 import AuthButton from './auth/AuthButton';
 import PrivacyWarning from './components/PrivacyWarning';
 import ExamplesPage from './pages/ExamplesPage';
@@ -12,7 +11,7 @@ import PlopperPage from './pages/PlopperPage';
 
 const App: React.FC = () => {
   return (
-    <AuthProvider>
+    <React.Fragment>
       <PrivacyWarning />
       <AuthButton />
       <BrowserRouter>
@@ -36,7 +35,7 @@ const App: React.FC = () => {
           </Switch>
         </QueryParamProvider>
       </BrowserRouter>
-    </AuthProvider>
+    </React.Fragment>
   );
 };
 

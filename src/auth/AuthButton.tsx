@@ -1,24 +1,38 @@
 import React from 'react';
 import { Button } from '@chakra-ui/react';
 
-import { useAuth } from './AuthProvider';
+import { signOut, useAuthState, useSignIn } from '../firebase/firebaseHelpers';
+
+const SignOutButton: React.FC = () => {
+  const [user] = useAuthState();
+
+  return (
+    <Button onClick={() => signOut()}>Sign Out {user?.displayName}</Button>
+  );
+};
+
+const SignInButton: React.FC = () => {
+  const [signIn, , loading] = useSignIn();
+
+  return (
+    <Button
+      onClick={() => {
+        signIn();
+      }}
+      isLoading={loading}
+      isDisabled={loading}
+    >
+      Sign In
+    </Button>
+  );
+};
 
 const AuthButton: React.FC = () => {
-  const auth = useAuth();
+  const [user, loading, error] = useAuthState();
 
-  if (auth.isAuthenticated === null) {
-    return null;
-  }
+  if (loading || error) return null;
 
-  if (auth.isAuthenticated && auth.user) {
-    return (
-      <Button onClick={() => auth.signOut()}>
-        Sign out {auth.user.displayName}
-      </Button>
-    );
-  }
-
-  return <Button onClick={() => auth.signIn()}>Sign in with Google</Button>;
+  return user ? <SignOutButton /> : <SignInButton />;
 };
 
 export default AuthButton;
