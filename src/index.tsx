@@ -1,8 +1,8 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-import App from './App';
 import './firebase/firebaseHelpers';
+import App from './App';
 import ThemeProvider from './theme/ThemeProvider';
 import reportWebVitals from './reportWebVitals';
 

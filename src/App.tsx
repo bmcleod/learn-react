@@ -2,8 +2,6 @@ import React from 'react';
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
 import { QueryParamProvider } from 'use-query-params';
 
-import AuthButton from './components/AuthButton';
-import PrivacyWarning from './components/PrivacyWarning';
 import ExamplesPage from './pages/ExamplesPage';
 import CompositionalPatterns from './pages/CompositionalPatterns';
 import JavascriptPatterns from './pages/JavascriptPatterns';
@@ -12,8 +10,6 @@ import PlopperPage from './pages/PlopperPage';
 const App: React.FC = () => {
   return (
     <React.Fragment>
-      <PrivacyWarning />
-      <AuthButton />
       <BrowserRouter>
         <QueryParamProvider ReactRouterRoute={Route}>
           <Switch>

@@ -1,15 +1,29 @@
 import React from 'react';
 import _ from 'lodash';
 import * as UI from '@chakra-ui/react';
-import useLocalStorageState from 'use-local-storage-state';
 import SanitizedHTML from 'react-sanitized-html';
 import sanitizeHTML from 'sanitize-html';
 import StackGrid from 'react-stack-grid';
 import isURL from 'is-url';
 import ReactPlayer from 'react-player';
 import axios from 'axios';
+import { useCollection } from 'react-firebase-hooks/firestore';
+import {
+  addDoc,
+  deleteDoc,
+  doc,
+  collection,
+  query,
+  where,
+} from 'firebase/firestore';
 
-import createShortCode from '../helpers/createShortCode';
+import {
+  firestore,
+  uploadImageBlob,
+  useAuthState,
+} from '../firebase/firebaseHelpers';
+import AuthButton from '../components/AuthButton';
+import PrivacyWarning from '../components/PrivacyWarning';
 
 const COLUMN_WIDTH = 480;
 
@@ -48,39 +62,48 @@ type PastedData =
   | PastedPlayerData;
 
 interface PastedItem {
-  id: string;
+  userId: string;
   data: PastedData;
+}
+interface PastedItemDocument {
+  id: string;
+  data: PastedItem;
 }
 
 const usePastedItems = (): PlopperShape => {
-  const [items, setItems] = useLocalStorageState<PastedItem[]>(
-    'pastedItems',
-    []
+  const [user, authStateLoading, authStateError] = useAuthState();
+
+  const [itemsSnapshot, itemsLoading, itemsError] = useCollection(
+    query(collection(firestore, 'items'), where('userId', '==', user?.uid)),
+    {
+      snapshotListenOptions: { includeMetadataChanges: true },
+    }
   );
+  const docs: PastedItemDocument[] =
+    itemsSnapshot?.docs.map((doc) => ({
+      id: doc.id,
+      data: doc.data() as PastedItem,
+    })) || [];
 
-  const add = (item: PastedItem) => {
-    setItems([...items, { ...item }]);
+  const loading = authStateLoading || itemsLoading;
+  const errorMessage = authStateError?.message || itemsError?.message || '';
+
+  const add = async (item: Partial<PastedItem>) => {
+    if (!user) return;
+
+    const result = await addDoc(collection(firestore, 'items'), {
+      ...item,
+      userId: user?.uid,
+    });
+
+    return result.id;
   };
 
-  const remove = (item: PastedItem) => {
-    setItems(items.filter((i) => i !== item));
+  const remove = (itemId: string) => {
+    return deleteDoc(doc(firestore, 'items', itemId));
   };
 
-  return { items, add, remove };
-};
-
-const readFileAsync = (file: Blob): Promise<string> => {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-
-    reader.onload = () => {
-      resolve(reader.result as string);
-    };
-
-    reader.onerror = reject;
-
-    reader.readAsDataURL(file);
-  });
+  return { docs, add, remove, loading, errorMessage };
 };
 
 const getPastedData = async (): Promise<PastedData> => {
@@ -123,8 +146,10 @@ const getPastedData = async (): Promise<PastedData> => {
     }
 
     if (mainType === 'image') {
-      const dataURL = await readFileAsync(blob);
-      result.src = dataURL.toString() || '';
+      // const dataURL = await readFileAsync(blob);
+      // result.src = dataURL.toString() || '';
+      const remoteURL = await uploadImageBlob(blob);
+      result.src = remoteURL;
       return result;
     }
   }
@@ -139,7 +164,8 @@ const usePasteCallback = (onPaste: (data: PastedData) => any) => {
         onPaste(pastedData);
       } catch (e) {
         console.error(
-          'Pasted contents could not be read. Did you try to paste a file?'
+          'Pasted contents could not be read. Did you try to paste a file?',
+          e
         );
       }
     };
@@ -172,9 +198,11 @@ const useInnerElementBackgroundColor = (query: string) => {
 };
 
 interface PlopperShape {
-  items: PastedItem[];
-  add: (item: PastedItem) => void;
-  remove: (item: PastedItem) => void;
+  docs: PastedItemDocument[];
+  add: (item: Partial<PastedItem>) => Promise<string | undefined>;
+  remove: (itemId: string) => Promise<void> | undefined;
+  loading: boolean;
+  errorMessage: string;
 }
 
 const PlopperContext = React.createContext<PlopperShape>({} as PlopperShape);
@@ -188,7 +216,7 @@ const PlopperProvider: React.FC = ({ children }) => {
 
   const handlePaste = React.useCallback(
     (data: PastedData) => {
-      add({ id: createShortCode(), data });
+      add({ data });
     },
     [add]
   );
@@ -332,22 +360,22 @@ const PastedItemGrid: React.FC = () => {
 
   return (
     <React.Fragment>
-      {_.isEmpty(pastingContext.items) ? null : (
+      {_.isEmpty(pastingContext.docs) ? null : (
         <StackGrid
           columnWidth={COLUMN_WIDTH}
           gutterWidth={12}
           gutterHeight={12}
           duration={300}
-          monitorImagesLoaded
+          monitorImagesLoaded={true}
         >
-          {pastingContext.items
+          {pastingContext.docs
             .slice()
             .reverse()
-            .map((item) => (
+            .map((doc) => (
               <PastedItemGridItem
-                key={item.id}
-                item={item}
-                onRemoveClick={() => pastingContext.remove(item)}
+                key={doc.id}
+                item={doc.data}
+                onRemoveClick={() => pastingContext.remove(doc.id)}
               />
             ))}
         </StackGrid>
@@ -366,16 +394,30 @@ const PastedItemGrid: React.FC = () => {
   );
 };
 
-const PlopperPage: React.FC = () => {
+const PlopperPageInner: React.FC = () => {
   return (
     <PlopperProvider>
-      <UI.Heading textAlign="center" my={4} color="gray.500">
-        plopper.
-      </UI.Heading>
       <UI.Box p={4}>
         <PastedItemGrid />
       </UI.Box>
     </PlopperProvider>
+  );
+};
+
+const PlopperPage: React.FC = () => {
+  const [user] = useAuthState();
+
+  if (!user) return null;
+
+  return (
+    <React.Fragment>
+      <PrivacyWarning />
+      <AuthButton />
+      <UI.Heading textAlign="center" my={4} color="gray.500">
+        plopper.
+      </UI.Heading>
+      <PlopperPageInner />
+    </React.Fragment>
   );
 };
 
