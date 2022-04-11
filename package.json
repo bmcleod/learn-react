@@ -48,7 +48,8 @@
     "web-vitals": "^1.0.1"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "start": "vercel dev",
+    "start:no-api": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
@@ -90,6 +91,7 @@
     "@storybook/node-logger": "^6.3.7",
     "@storybook/preset-create-react-app": "^3.2.0",
     "@storybook/react": "^6.3.7",
-    "prettier": "2.3.2"
+    "prettier": "2.3.2",
+    "vercel": "^24.0.1"
   }
 }

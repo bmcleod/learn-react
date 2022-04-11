@@ -24,3 +24,4 @@ yarn-error.log*
 
 #npm in favor of yarn
 package-lock.json
+.vercel
