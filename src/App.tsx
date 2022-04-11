@@ -2,7 +2,7 @@ import React from 'react';
 import { BrowserRouter, Route, Switch } from 'react-router-dom';
 import { QueryParamProvider } from 'use-query-params';
 
-import AuthButton from './auth/AuthButton';
+import AuthButton from './components/AuthButton';
 import PrivacyWarning from './components/PrivacyWarning';
 import ExamplesPage from './pages/ExamplesPage';
 import CompositionalPatterns from './pages/CompositionalPatterns';
