@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button } from '@chakra-ui/react';
 
-import { signOut, useAuthState, useSignIn } from '../firebase/firebaseHelpers';
+import { signOut, useAuthState, useSignIn } from '.';
 
 const SignOutButton: React.FC = () => {
   const [user] = useAuthState();
