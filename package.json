@@ -30,6 +30,7 @@
     "axios-hooks": "^2.7.0",
     "babel-loader": "8.1.0",
     "date-fns": "^2.23.0",
+    "firebase": "^9.6.10",
     "framer-motion": "^4",
     "got": "^11",
     "is-url": "^1.2.4",

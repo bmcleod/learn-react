@@ -1,9 +1,13 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { ChakraProvider, extendTheme } from '@chakra-ui/react';
+import { initializeApp } from 'firebase/app';
 
+import firebaseConfig from './firebaseConfig';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
+
+initializeApp(firebaseConfig);
 
 const theme = extendTheme({
   styles: {
