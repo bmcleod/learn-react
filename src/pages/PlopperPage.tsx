@@ -355,31 +355,59 @@ const PastedItemGridItem: React.FC<{
   );
 };
 
+const useMonitorStackGridImages = (): [
+  React.RefObject<HTMLDivElement>,
+  React.RefObject<StackGrid>
+] => {
+  const imageContainerRef = React.useRef<HTMLDivElement>(null);
+  const stackGridRef = React.useRef<StackGrid>(null);
+
+  React.useEffect(() => {
+    const imageContainer = imageContainerRef.current;
+
+    const handleLoad = () => {
+      // @ts-ignore
+      stackGridRef.current?.updateLayout();
+    };
+
+    imageContainer?.addEventListener('load', handleLoad, true);
+
+    return () => {
+      imageContainer?.removeEventListener('load', handleLoad, true);
+    };
+  }, [imageContainerRef, stackGridRef]);
+
+  return [imageContainerRef, stackGridRef];
+};
+
 const PastedItemGrid: React.FC = () => {
   const pastingContext = usePlopper();
+  const [imageContainerRef, stackGridRef] = useMonitorStackGridImages();
 
   return (
     <React.Fragment>
-      {_.isEmpty(pastingContext.docs) ? null : (
-        <StackGrid
-          columnWidth={COLUMN_WIDTH}
-          gutterWidth={12}
-          gutterHeight={12}
-          duration={300}
-          monitorImagesLoaded={true}
-        >
-          {pastingContext.docs
-            .slice()
-            .reverse()
-            .map((doc) => (
-              <PastedItemGridItem
-                key={doc.id}
-                item={doc.data}
-                onRemoveClick={() => pastingContext.remove(doc.id)}
-              />
-            ))}
-        </StackGrid>
-      )}
+      <UI.Box ref={imageContainerRef}>
+        {_.isEmpty(pastingContext.docs) ? null : (
+          <StackGrid
+            ref={stackGridRef}
+            columnWidth={COLUMN_WIDTH}
+            gutterWidth={12}
+            gutterHeight={12}
+            duration={300}
+          >
+            {pastingContext.docs
+              .slice()
+              .reverse()
+              .map((doc) => (
+                <PastedItemGridItem
+                  key={doc.id}
+                  item={doc.data}
+                  onRemoveClick={() => pastingContext.remove(doc.id)}
+                />
+              ))}
+          </StackGrid>
+        )}
+      </UI.Box>
       <UI.Box textAlign="center" p={4} mt={8}>
         <UI.Heading size="md" mb={4}>
           Try pasting something!
