@@ -69,80 +69,80 @@ const usePastedItems = (): PlopperShape => {
   return { items, add, remove };
 };
 
+const readFileAsync = (file: Blob): Promise<string> => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+
+    reader.onload = () => {
+      resolve(reader.result as string);
+    };
+
+    reader.onerror = reject;
+
+    reader.readAsDataURL(file);
+  });
+};
+
+const getPastedData = async (): Promise<PastedData> => {
+  // Detect URL
+  const text = await window.navigator.clipboard.readText();
+  if (text) {
+    if (isURL(text)) {
+      if (ReactPlayer.canPlay(text)) {
+        return {
+          type: 'player',
+          url: text,
+        };
+      } else {
+        const result = await axios.get('/api/metascraper', {
+          params: { url: text },
+        });
+        return {
+          type: 'url',
+          url: text,
+          meta: result.data,
+        };
+      }
+    }
+  }
+
+  const data = await window.navigator.clipboard.read();
+  const clipboardItem = data[0];
+
+  const result: any = {};
+
+  for (const type of clipboardItem.types) {
+    const [mainType, subType] = type.split('/');
+    const blob = await clipboardItem.getType(type);
+    result.type = mainType;
+
+    if (mainType === 'text') {
+      const text = result.text || {};
+      text[subType] = await blob.text();
+      result.text = text;
+    }
+
+    if (mainType === 'image') {
+      const dataURL = await readFileAsync(blob);
+      result.src = dataURL.toString() || '';
+      return result;
+    }
+  }
+  return result;
+};
+
 const usePasteCallback = (onPaste: (data: PastedData) => any) => {
   React.useEffect(() => {
     const handlePaste = async () => {
-      // Detect URL
-      const text = await window.navigator.clipboard.readText();
-      if (text) {
-        if (isURL(text)) {
-          if (ReactPlayer.canPlay(text)) {
-            onPaste({
-              type: 'player',
-              url: text,
-            });
-            return;
-          } else {
-            const result = await axios.get('/api/metascraper', {
-              params: { url: text },
-            });
-            console.log({ result });
-            onPaste({
-              type: 'url',
-              url: text,
-              meta: result.data,
-            });
-            return;
-          }
-        }
-      }
-
       try {
-        const data = await window.navigator.clipboard.read();
-        const clipboardItem = data[0];
-
-        const result: any = {};
-        let run = true;
-
-        for (const type of clipboardItem.types) {
-          const [mainType, subType] = type.split('/');
-          const blob = await clipboardItem.getType(type);
-          result.type = mainType;
-
-          if (mainType === 'text') {
-            const text = result.text || {};
-            text[subType] = await blob.text();
-            result.text = text;
-          }
-
-          if (mainType === 'image') {
-            run = false;
-            const fileReader = new FileReader();
-            fileReader.addEventListener(
-              'load',
-              () => {
-                result.src = fileReader.result?.toString() || '';
-                onPaste(result);
-              },
-              false
-            );
-            await fileReader.readAsDataURL(blob);
-          }
-        }
-        if (run) {
-          onPaste(result);
-        }
+        const pastedData = await getPastedData();
+        onPaste(pastedData);
       } catch (e) {
         console.error(
           'Pasted contents could not be read. Did you try to paste a file?'
         );
       }
     };
-
-    // Auto-paste?
-    // window.navigator.clipboard.readText().then((text) => {
-    //   console.log(text);
-    // });
 
     window.document.body.addEventListener('paste', handlePaste);
 
