@@ -7,6 +7,7 @@ import sanitizeHTML from 'sanitize-html';
 import StackGrid from 'react-stack-grid';
 import isURL from 'is-url';
 import ReactPlayer from 'react-player';
+import axios from 'axios';
 
 import createShortCode from '../helpers/createShortCode';
 
@@ -29,10 +30,8 @@ interface PastedURLData {
   type: 'url';
   url: string;
   meta: Partial<{
-    author: string;
     description: string;
     image: string;
-    logo: string;
     title: string;
   }>;
 }
@@ -84,10 +83,14 @@ const usePasteCallback = (onPaste: (data: PastedData) => any) => {
             });
             return;
           } else {
+            const result = await axios.get('/api/metascraper', {
+              params: { url: text },
+            });
+            console.log({ result });
             onPaste({
               type: 'url',
               url: text,
-              meta: {},
+              meta: result.data,
             });
             return;
           }
@@ -257,11 +260,22 @@ const ImageItem: React.FC<{ item: PastedItem }> = ({ item }) => {
 const URLItem: React.FC<{ item: PastedItem }> = ({ item }) => {
   if (item.data.type !== 'url') return null;
 
+  const url = new URL(item.data.url);
+  const meta = item.data.meta;
+
   return (
-    <PastedItemWrapper>
-      <UI.Link href={item.data.url} target="_blank">
-        {item.data.url.split('://')[1]}
-      </UI.Link>
+    <PastedItemWrapper p={0}>
+      <UI.Box as="a" href={url.toString()} target="_blank">
+        <UI.Image src={meta.image} alt={meta.description} />
+        <UI.Box p={4}>
+          <UI.Text fontWeight="bold" mb={2}>
+            {meta.title}
+          </UI.Text>
+          <UI.Text color="gray.500" fontSize="sm">
+            {url.hostname}
+          </UI.Text>
+        </UI.Box>
+      </UI.Box>
     </PastedItemWrapper>
   );
 };
@@ -342,12 +356,7 @@ const PastedItemGrid: React.FC = () => {
         <UI.Heading size="md" mb={4}>
           Try pasting something!
         </UI.Heading>
-        <UI.List
-          textTransform="uppercase"
-          fontWeight="bold"
-          color="gray.500"
-          fontSize="sm"
-        >
+        <UI.List color="gray.500" fontSize="sm">
           <UI.ListItem>Plain text or rich text</UI.ListItem>
           <UI.ListItem>Images or links</UI.ListItem>
           <UI.ListItem>Videos from YouTube or Twitch</UI.ListItem>
