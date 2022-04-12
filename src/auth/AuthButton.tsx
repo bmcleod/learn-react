@@ -1,29 +1,30 @@
 import React from 'react';
-import { Button } from '@chakra-ui/react';
+import * as UI from '@chakra-ui/react';
 
 import { signOut, useAuthState, useSignIn } from '.';
 
-const SignOutButton: React.FC = () => {
-  const [user] = useAuthState();
-
+export const SignOutButton: React.FC<UI.ButtonProps> = (props) => {
   return (
-    <Button onClick={() => signOut()}>Sign Out {user?.displayName}</Button>
+    <UI.Button onClick={() => signOut()} {...props}>
+      Sign Out
+    </UI.Button>
   );
 };
 
-const SignInButton: React.FC = () => {
+export const SignInButton: React.FC<UI.ButtonProps> = (props) => {
   const [signIn, , loading] = useSignIn();
 
   return (
-    <Button
+    <UI.Button
       onClick={() => {
         signIn();
       }}
-      isLoading={loading}
-      isDisabled={loading}
+      disabled={loading}
+      loading={loading}
+      {...props}
     >
-      Sign In
-    </Button>
+      Sign In with Google
+    </UI.Button>
   );
 };
 

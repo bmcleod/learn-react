@@ -10,7 +10,7 @@ import { PastedItem } from './pastedItem';
 import { useAuthState } from '../auth';
 import useInnerElementBackgroundColor from '../helpers/useInnerElementBackgroundColor';
 import useMonitorStackGridImages from '../helpers/useMonitorStackGridImages';
-import AuthButton from '../auth/AuthButton';
+import { SignInButton, SignOutButton } from '../auth/AuthButton';
 import PrivacyWarning from './PrivacyWarning';
 import PlopperProvider, { usePlopper } from './PlopperProvider';
 
@@ -169,7 +169,15 @@ const PastedItemGrid: React.FC = () => {
           </StackGrid>
         )}
       </UI.Box>
-      <UI.Box textAlign="center" p={4} mt={8}>
+      <UI.Box
+        textAlign="center"
+        bg="white"
+        borderRadius="lg"
+        maxWidth="420px"
+        p={4}
+        mx="auto"
+        mt={8}
+      >
         <UI.Heading size="md" mb={4}>
           Try pasting something!
         </UI.Heading>
@@ -186,20 +194,36 @@ const PastedItemGrid: React.FC = () => {
 const PlopperPage: React.FC = () => {
   const [user] = useAuthState();
 
-  if (!user) return null;
-
-  return (
-    <React.Fragment>
-      <PrivacyWarning />
-      <AuthButton />
+  const heading = (
+    <UI.SimpleGrid columns={3} alignItems="center">
+      <UI.Box />
       <UI.Heading textAlign="center" my={4} color="gray.500">
         plopper.
       </UI.Heading>
+      <UI.Box textAlign="right" px={4}>
+        {user ? (
+          <SignOutButton colorScheme="black" variant="outline" size="xs" />
+        ) : null}
+      </UI.Box>
+    </UI.SimpleGrid>
+  );
+
+  return user ? (
+    <React.Fragment>
+      <PrivacyWarning />
+      {heading}
       <PlopperProvider>
         <UI.Box p={4}>
           <PastedItemGrid />
         </UI.Box>
       </PlopperProvider>
+    </React.Fragment>
+  ) : (
+    <React.Fragment>
+      {heading}
+      <UI.Box textAlign="center" p={4}>
+        <SignInButton colorScheme="green" />
+      </UI.Box>
     </React.Fragment>
   );
 };
