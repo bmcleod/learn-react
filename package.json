@@ -1,6 +1,6 @@
 {
-  "name": "learn-react",
-  "version": "0.2.0",
+  "name": "splat",
+  "version": "0.2.1",
   "private": true,
   "dependencies": {
     "@chakra-ui/react": "^1.6.7",
