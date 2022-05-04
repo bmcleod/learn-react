@@ -3,6 +3,7 @@ import * as UI from '@chakra-ui/react';
 import SanitizedHTML from 'react-sanitized-html';
 import sanitizeHTML from 'sanitize-html';
 import ReactPlayer from 'react-player';
+import { useDrag } from 'react-dnd';
 
 import { PastedItem } from './pastedItem';
 import useInnerElementBackgroundColor from '../helpers/useInnerElementBackgroundColor';
@@ -125,9 +126,27 @@ export const PastedItemView: React.FC<
   }
 > = ({ item, onRemoveClick, ...restProps }) => {
   const itemProps = { item, ...restProps };
+  console.log(item);
+  const [{ opacity, isDragging }, dragRef] = useDrag(
+    () => ({
+      type: 'card',
+      item: { ...item.data },
+      end: (item, monitor) => {
+        const dropResult = monitor.getDropResult();
+        if (item.type === 'url' && dropResult) {
+          alert(`You dropped item ${item?.meta?.title}!`);
+        }
+      },
+      collect: (monitor) => ({
+        opacity: monitor.isDragging() ? 0.5 : 1,
+        isDragging: monitor.isDragging(),
+      }),
+    }),
+    []
+  );
 
   return (
-    <UI.Box position="relative">
+    <UI.Box ref={dragRef} style={{ opacity }} position="relative">
       <UI.Button
         position="absolute"
         top={2}
