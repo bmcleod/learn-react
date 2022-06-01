@@ -13,7 +13,9 @@ import _ from 'lodash';
 export const firestore = getFirestore(app);
 
 export const createConverter = function <T>() {
-  type K = T & QueryDocumentSnapshot;
+  type K = T & {
+    id: string;
+  };
 
   const converter: FirestoreDataConverter<K> = {
     toFirestore(entity: WithFieldValue<K>): DocumentData {
@@ -25,8 +27,8 @@ export const createConverter = function <T>() {
     ): K {
       const data = snapshot.data(options) as T;
       return {
+        id: snapshot.id,
         ...data,
-        ...snapshot,
       };
     },
   };

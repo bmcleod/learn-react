@@ -46,43 +46,75 @@ const MessageList: React.FC = () => {
 
   return (
     <React.Fragment>
-      <input
-        type="search"
-        id="search"
-        value={searchTerm}
-        placeholder="Search message history"
-        onChange={(e) => setSearchTerm(e.target.value)}
-      />
-      <UI.Button colorScheme="green" onClick={handleSearch}>
-        Search
-      </UI.Button>
-      <UI.UnorderedList>
+      <UI.InputGroup padding="20px">
+        <UI.Input
+          type="search"
+          id="search"
+          value={searchTerm}
+          placeholder="Search message history"
+          onChange={(e) => setSearchTerm(e.target.value)}
+          background="white"
+        />
+        <UI.Button colorScheme="green" onClick={handleSearch}>
+          Search
+        </UI.Button>
+      </UI.InputGroup>
+      <UI.UnorderedList
+        display="flex"
+        flexDirection="column-reverse"
+        height="80vmin"
+        overflow="auto"
+      >
         {!searchMode &&
           messages?.map((message) => (
-            <UI.ListItem key={message.id}>
-              <UI.Avatar
-                name={message.authorName}
-                src={`https://www.gravatar.com/avatar/${Md5.hashAsciiStr(
-                  message.email || 'lbmcleod@gmail.com'
-                )}`}
-              />
-              <UI.Text>
-                {message.authorName}: {message.text} at {message.time}
-              </UI.Text>
+            <UI.ListItem
+              key={message.id}
+              listStyleType="none"
+              mb="3"
+              alignContent="center"
+            >
+              <UI.Grid templateColumns="64px auto">
+                <UI.GridItem>
+                  <UI.Avatar
+                    name={message.authorName}
+                    src={`https://www.gravatar.com/avatar/${Md5.hashAsciiStr(
+                      message.email || 'lbmcleod@gmail.com'
+                    )}`}
+                  />
+                </UI.GridItem>
+                <UI.GridItem>
+                  <UI.Text fontSize="sm">
+                    {message.authorName} on{' '}
+                    {new Date(message.time).toLocaleString('en-US')}
+                  </UI.Text>
+                  <UI.Text>{message.text}</UI.Text>
+                </UI.GridItem>
+              </UI.Grid>
             </UI.ListItem>
           ))}
         {searchMode &&
           filteredMessages?.map((message) => (
-            <UI.ListItem key={message.id}>
-              <UI.Avatar
-                name={message.authorName}
-                src={`https://www.gravatar.com/avatar/${Md5.hashAsciiStr(
-                  message.email || 'lbmcleod@gmail.com'
-                )}`}
-              />
-              <UI.Text>
-                {message.authorName}: {message.text} at {message.time}
-              </UI.Text>
+            <UI.ListItem
+              key={message.id}
+              listStyleType="none"
+              mb="3"
+              alignContent="center"
+            >
+              <UI.Grid templateColumns="64px auto">
+                <UI.GridItem>
+                  <UI.Avatar
+                    name={message.authorName}
+                    src={`https://www.gravatar.com/avatar/${Md5.hashAsciiStr(
+                      message.email || 'lbmcleod@gmail.com'
+                    )}`}
+                  />
+                </UI.GridItem>
+                <UI.GridItem>
+                  <UI.Text>
+                    {message.authorName}: {message.text} at {message.time}
+                  </UI.Text>
+                </UI.GridItem>
+              </UI.Grid>
             </UI.ListItem>
           ))}
       </UI.UnorderedList>
@@ -114,18 +146,23 @@ const FirebasePage: React.FC = () => {
       <UI.Button colorScheme="green" onClick={() => signOut()}>
         Sign Out
       </UI.Button>
-      <UI.Divider />
-      <MessageList />
-      <UI.Divider />
-      <input
-        type="text"
-        placeholder="Message"
-        onChange={(e) => setMessage(e.target.value)}
-        value={message}
-      />
-      <UI.Button colorScheme="green" onClick={handleAddClick}>
-        Add test message
-      </UI.Button>
+      <UI.Box height="87vmin" overflowY="scroll">
+        <MessageList />
+      </UI.Box>
+      <UI.Box padding="25px">
+        <UI.InputGroup>
+          <UI.Input
+            type="text"
+            placeholder="Message"
+            onChange={(e) => setMessage(e.target.value)}
+            value={message}
+            background="white"
+          />
+          <UI.Button colorScheme="green" onClick={handleAddClick}>
+            Send
+          </UI.Button>
+        </UI.InputGroup>
+      </UI.Box>
     </React.Fragment>
   );
 };
