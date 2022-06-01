@@ -74,9 +74,9 @@ const IconExample: React.FC = () => {
         Working with icons
       </UI.Heading>
       <UI.SimpleGrid gap={4} padding={4}>
-        <FontAwesomeIcon icon={icons.faCoffee} />
-        <FontAwesomeIcon icon={icons.faCoffee} flip="horizontal" />
-        <FontAwesomeIcon icon={icons.faCoffee} spin />
+        <FontAwesomeIcon icon={['fas', 'coffee']} />
+        <FontAwesomeIcon icon={['fas', 'coffee']} flip="horizontal" />
+        <FontAwesomeIcon icon={['fas', 'coffee']} spin />
       </UI.SimpleGrid>
     </UI.Box>
   );
